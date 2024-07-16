@@ -1,1 +1,1 @@
-gcc main.c -lusb-1.0 -o mouse_rgb
+gcc main.c -lusb-1.0 -o bin/mouse-rgb

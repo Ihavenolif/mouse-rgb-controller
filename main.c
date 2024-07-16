@@ -1,6 +1,7 @@
 #include <libusb-1.0/libusb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void set_rgb(libusb_device_handle *handle, uint8_t red, uint8_t green, uint8_t blue)
 {
@@ -24,8 +25,17 @@ void set_rgb(libusb_device_handle *handle, uint8_t red, uint8_t green, uint8_t b
         fprintf(stderr, "Error in control transfer: %s\n", libusb_error_name(res));
     }
 }
-int main()
+int main(int argc, char *argv[])
 {
+    if (argc <= 1 || strlen(argv[0]) == 0 || argv[1][0] != '#')
+    {
+        printf("Invalid format. Example:\n\nmouse-rgb \"#ff0000\"");
+    }
+
+    int red, green, blue;
+
+    sscanf(argv[1], "#%2x%2x%2x", &red, &green, &blue);
+
     libusb_context *ctx = NULL;
     libusb_device_handle *handle = NULL;
 
@@ -57,16 +67,11 @@ int main()
     }
 
     int x = libusb_claim_interface(handle, 1);
-    fprintf(stderr, "%s\n", libusb_error_name(x));
 
-    set_rgb(handle, 0x00, 0x00, 0xff); // Set color to red
-
-    printf("did thing");
-
+    set_rgb(handle, red, green, blue); // Set color to red
     libusb_release_interface(handle, 1);
 
     x = libusb_attach_kernel_driver(handle, 1);
-    fprintf(stderr, "%s\n", libusb_error_name(x));
 
     libusb_close(handle);
     libusb_exit(ctx);
